@@ -1,0 +1,86 @@
+clear
+close all;
+
+I = 20;
+mu = 1.25663706 * 10^-6;
+r = 5;
+
+[x, y, z] = meshgrid(-20:3:20, -20:3:20, -20:3:20);
+% Initialize magnetic field components
+Bx = zeros(size(x));
+By = zeros(size(y));
+Bz = zeros(size(z));
+
+% Calculate magnetic field at each point in the grid
+%Taking initial value of Bx, By, Bz and adding a calculated value from a
+%discretized theta. This let's us do numerical approximation for our field
+%without taking the actual integral (which is too complicated for MATLAB)
+for i = 1:numel(x)
+    for theta = 0:0.1:2*pi 
+        dBx = (mu * I * z(i) * r * cos(theta)) / (4 * pi * ((x(i) - r * cos(theta))^2 + (y(i) - r * sin(theta))^2 + z(i)^2)^(3/2));
+        dBy = (mu * I * z(i) * r * sin(theta)) / (4 * pi * ((x(i) - r * cos(theta))^2 + (y(i) - r * sin(theta))^2 + z(i)^2)^(3/2));
+        dBz = (mu * I * (r^2 - r * (y(i) * sin(theta) + x(i) * cos(theta)))) / (4 * pi * ((x(i) - r * cos(theta))^2 + (y(i) - r * sin(theta))^2 + z(i)^2)^(3/2));
+        
+        Bx(i) = Bx(i) + dBx;
+        By(i) = By(i) + dBy;
+        Bz(i) = Bz(i) + dBz;
+    end
+end
+
+% Normalize the magnetic field vectors for our quiver plot
+B_norm = sqrt(Bx.^2 + By.^2 + Bz.^2);
+Bx_norm = Bx ./ B_norm;
+By_norm = By ./ B_norm;
+Bz_norm = Bz ./ B_norm;
+
+
+%Un-normalized Plot
+figure;
+quiver3(x, y, z, Bx*5, By*5, Bz*5, 'LineWidth', 1);
+grid on;
+xlabel('x');
+ylabel('y');
+zlabel('z');
+title('Magnetic Field Lines due to a Current Loop');
+hold on
+t = 0:pi/50:2*pi;
+xt = r*cos(t);
+yt = r*sin(t);
+zt = zeros(size(xt)); % Adding zeros to zt to match dimensions
+p = plot3(xt', yt', zt'); % Transpose the arrays to column vectors
+hold off
+% Plotting magnetic field lines using quiver3
+figure;
+quiver3(x, y, z, Bx_norm, By_norm, Bz_norm,.5, 'LineWidth', 1);
+grid on;
+xlabel('x');
+ylabel('y');
+zlabel('z');
+title('Normalized Magnetic Field Lines');
+hold on
+t = 0:pi/50:2*pi;
+xt = r*cos(t);
+yt = r*sin(t);
+zt = zeros(size(xt)); % Adding zeros to zt to match dimensions
+p = plot3(xt', yt', zt'); % Transpose the arrays to column vectors
+hold off
+%Making a pretty contour plot to visualize magnitude as a function of x,y
+figure;
+contourf(x(:,:,1), y(:,:,1), B_norm(:,:,1), 20); % Contour plot
+colorbar;
+xlabel('x');
+ylabel('y');
+title('Magnetic Field Magnitude');
+figure;
+quiver(x, z, (Bx), (Bz), 1.5, LineWidth=1);
+grid on;
+xlabel('x');
+zlabel('z');
+title('Magnetic Field in XZ Plane');
+hold on
+t = 0:pi/50:2*pi;
+xt = r*cos(t);
+yt = r*sin(t);
+zt = zeros(size(xt)); % Adding zeros to zt to match dimensions
+p = plot(xt', zt', LineWidth=2); % Transpose the arrays to column vectors
+hold off
