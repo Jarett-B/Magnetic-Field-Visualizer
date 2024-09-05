@@ -49,6 +49,7 @@ yt = r*sin(t);
 zt = zeros(size(xt)); % Adding zeros to zt to match dimensions
 p = plot3(xt', yt', zt'); % Transpose the arrays to column vectors
 hold off
+
 % Plotting magnetic field lines using quiver3
 figure;
 quiver3(x, y, z, Bx_norm, By_norm, Bz_norm,.5, 'LineWidth', 1);
@@ -64,6 +65,7 @@ yt = r*sin(t);
 zt = zeros(size(xt)); % Adding zeros to zt to match dimensions
 p = plot3(xt', yt', zt'); % Transpose the arrays to column vectors
 hold off
+
 %Making a pretty contour plot to visualize magnitude as a function of x,y
 figure;
 contourf(x(:,:,1), y(:,:,1), B_norm(:,:,1), 20); % Contour plot
